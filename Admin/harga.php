@@ -1,44 +1,44 @@
 <?php include 'header.php'; ?>
-<br />
-<br />
-<br />
-<div class="container">
+<?php include '../koneksi.php'; ?>
 
-<div class="col-md-5 col-md-offset-3">
-    <div class="panel">
-        <div class="panel-heading">
-            <h4>Pengaturan Harga Laundry</h4>
-        </div>
-        <div class="panel-body">
-            <?php
-            // Menghubungkan koneksi
-            include '../koneksi.php';
+<!-- Main Container -->
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-6">
+        <div class="card shadow rounded">
+            <div class="card-header bg-primary text-white text-center">
+                <h5 class="mb-0">⚙️ Pengaturan Harga Laundry</h5>
+            </div>
+            <div class="card-body">
+                <?php
+                // Mengambil data harga per kilo dari tabel harga
+                $query = "SELECT harga_per_kilo FROM harga LIMIT 1";
+                $result = mysqli_query($koneksi, $query);
 
-            // Mengambil data harga per kilo dari tabel harga
-            $query = "SELECT harga_per_kilo FROM harga LIMIT 1";
-            $result = mysqli_query($koneksi, $query);
-
-            if (!$result) {
-                echo "<p>Error retrieving data: " . mysqli_error($koneksi) . "</p>";
-            } else {
-                $data = mysqli_fetch_assoc($result);
-                if ($data) {
-            ?>
-                    <form method="post" action="harga_update.php">
-                        <div class="form-group">
-                            <label>Harga per Kilo</label>
-                            <input type="number" class="form-control" min="0" name="harga" value="<?php echo htmlspecialchars($data['harga_per_kilo']); ?>" required>
-                        </div>
-                        <br>
-                        <input type="submit" class="btn btn-primary" value="Ubah Harga">
-                    </form>
-            <?php
+                if (!$result) {
+                    echo "<div class='alert alert-danger'>Gagal mengambil data: " . mysqli_error($koneksi) . "</div>";
                 } else {
-                    echo "<p>Harga per kilo not found.</p>";
+                    $data = mysqli_fetch_assoc($result);
+                    if ($data) {
+                ?>
+                        <form method="post" action="harga_update.php">
+                            <div class="mb-3">
+                                <label for="harga" class="form-label">Harga per Kilo (Rp)</label>
+                                <input type="number" id="harga" name="harga" class="form-control" min="0" value="<?= htmlspecialchars($data['harga_per_kilo']); ?>" required>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    💾 Simpan Perubahan
+                                </button>
+                            </div>
+                        </form>
+                <?php
+                    } else {
+                        echo "<div class='alert alert-warning'>Data harga belum tersedia.</div>";
+                    }
                 }
-            }
-            mysqli_close($koneksi);
-            ?>
+                mysqli_close($koneksi);
+                ?>
+            </div>
         </div>
     </div>
 </div>
