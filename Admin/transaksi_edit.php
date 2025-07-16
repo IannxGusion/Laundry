@@ -1,110 +1,106 @@
 <?php include 'header.php'; ?>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
 
-<?php
-// koneksi database
-include '../koneksi.php';
-?>
+<style>
+    .form-section {
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .form-section h4 {
+        color: #007bff;
+        font-weight: 600;
+    }
+    .table thead {
+        background: #f1f1f1;
+    }
+</style>
 
-<div class="container">
-    <div class="panel">
-        <div class="panel-heading">
-            <h4>Edit Transaksi Laundry</h4>
+<div class="container mt-5 mb-5">
+    <div class="form-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4><i class="bi bi-pencil-square me-2"></i> Edit Transaksi Laundry</h4>
+            <a href="transaksi.php" class="btn btn-sm btn-secondary"><i class="bi bi-arrow-left"></i> Kembali</a>
         </div>
-        <div class="panel-body">
 
-            <div class="col-md-8 col-md-offset-2">
-                <a href="transaksi.php" class="btn btn-sm btn-info pull-right">Kembali</a>
-                <br><br>
-                
-                <?php
-                // menangkap id yang dikirim melalui url
-                $id = $_GET['id'];
+        <?php
+        include '../koneksi.php';
+        $id = $_GET['id'];
+        $transaksi = mysqli_query($koneksi, "SELECT * FROM transaksi WHERE transaksi_id='$id'");
+        while($t = mysqli_fetch_array($transaksi)) {
+        ?>
+        <form method="post" action="transaksi_update.php">
+            <input type="hidden" name="id" value="<?= $t['transaksi_id']; ?>">
 
-                // mengambil data transaksi yang ber-id di atas dari tabel transaksi 
-                $transaksi = mysqli_query($koneksi, "SELECT * FROM transaksi WHERE transaksi_id='$id'");
-                while($t = mysqli_fetch_array($transaksi)) {
-                ?>
-                
-                <form method="post" action="transaksi_update.php">
-                    <!-- menyimpan id transaksi yang di edit form hidden berikut -->
-                    <input type="hidden" name="id" value="<?php echo $t['transaksi_id']; ?>">
-                    
-                    <div class="form-group">
-                        <label>Pelanggan</label>
-                        <select class="form-control" name="pelanggan" required="required">
-                            <option value="">- pilih pelanggan -</option>
-                            <?php
-                            // mengambil data pelanggan dari database
-                            $data = mysqli_query($koneksi, "SELECT * FROM pelanggan");
-                            // mengubah data ke array dan menampilkan dengan perulangan while
-                            while($d = mysqli_fetch_array($data)) {
-                                ?>
-                                <option <?php if($d['pelanggan_id'] == $t['transaksi_pelanggan']) { echo "selected='selected'"; } ?> value="<?php echo $d['pelanggan_id']; ?>"><?php echo $d['pelanggan_nama']; ?></option>
-                                <?php
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Berat</label>
-                        <input type="number" class="form-control" name="berat" required="required" value="<?php echo $t['transaksi_berat']; ?>">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Tgl. Selesai</label>
-                        <input type="date" class="form-control" name="tgl_selesai" required="required" value="<?php echo $t['transaksi_tgl_selesai']; ?>">
-                    </div>
-                    <br>
-                    
-                    <table class="table table-bordered table-striped">
-                        <tr>
-                            <th>Jenis Pakaian</th>
-                            <th width="20%">Jumlah</th>
-                        </tr>
-                    
+            <div class="mb-3">
+                <label class="form-label">Pelanggan</label>
+                <select class="form-control" name="pelanggan" required>
+                    <option value="">- Pilih Pelanggan -</option>
                     <?php
-                    // menyimpan id transaksi ke variabel id_transaksi
-                    $id_transaksi = $t['transaksi_id'];
-                    // menampilkan pakaian-pakaian dari transaksi yang ber-id di atas
-                    $pakaian = mysqli_query($koneksi, "SELECT * FROM pakaian WHERE pakaian_transaksi='$id_transaksi'");
-                    while($p = mysqli_fetch_array($pakaian)) {
-                        ?>
-                        <tr>
-                            <td><input type="text" class="form-control" name="jenis_pakaian[]" value="<?php echo $p['pakaian_jenis']; ?>"></td>
-                            <td><input type="number" class="form-control" name="jumlah_pakaian[]" value="<?php echo $p['pakaian_jumlah']; ?>"></td>
-                        </tr>
-                        <?php
+                    $data = mysqli_query($koneksi, "SELECT * FROM pelanggan");
+                    while($d = mysqli_fetch_array($data)) {
+                        $selected = ($d['pelanggan_id'] == $t['transaksi_pelanggan']) ? "selected" : "";
+                        echo "<option value='{$d['pelanggan_id']}' $selected>{$d['pelanggan_nama']}</option>";
                     }
                     ?>
-
-                    <!-- Additional input rows for new items -->
-                    <?php for($i = 0; $i < 5; $i++) { ?>
-                        <tr>
-                            <td><input type="text" class="form-control" name="jenis_pakaian[]"></td>
-                            <td><input type="number" class="form-control" name="jumlah_pakaian[]"></td>
-                        </tr>
-                    <?php } ?>
-                    
-                    </table>
-                    
-                    <div class="form-group alert alert-info">
-                        <label>Status</label>
-                        <select class="form-control" name="status" required="required">
-                            <option <?php if($t['transaksi_status'] == "0") { echo "selected='selected'"; } ?> value="0">PROSES</option>
-                            <option <?php if($t['transaksi_status'] == "1") { echo "selected='selected'"; } ?> value="1">DICUCI</option>
-                            <option <?php if($t['transaksi_status'] == "2") { echo "selected='selected'"; } ?> value="2">SELESAI</option>
-                        </select>
-                    </div>
-                    
-                    <input type="submit" class="btn btn-primary" value="Simpan">
-                </form>
-                
-                <?php
-                }
-                ?>
+                </select>
             </div>
-        </div>
+
+            <div class="mb-3">
+                <label class="form-label">Berat (kg)</label>
+                <input type="number" class="form-control" name="berat" value="<?= $t['transaksi_berat']; ?>" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tanggal Selesai</label>
+                <input type="date" class="form-control" name="tgl_selesai" value="<?= $t['transaksi_tgl_selesai']; ?>" required>
+            </div>
+
+            <h5 class="mt-4 mb-3"><i class="bi bi-basket"></i> Daftar Pakaian</h5>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Jenis Pakaian</th>
+                        <th width="20%">Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $id_transaksi = $t['transaksi_id'];
+                    $pakaian = mysqli_query($koneksi, "SELECT * FROM pakaian WHERE pakaian_transaksi='$id_transaksi'");
+                    while($p = mysqli_fetch_array($pakaian)) {
+                    ?>
+                    <tr>
+                        <td><input type="text" class="form-control" name="jenis_pakaian[]" value="<?= $p['pakaian_jenis']; ?>"></td>
+                        <td><input type="number" class="form-control" name="jumlah_pakaian[]" value="<?= $p['pakaian_jumlah']; ?>"></td>
+                    </tr>
+                    <?php } ?>
+
+                    <!-- Tambahan baris kosong -->
+                    <?php for($i = 0; $i < 3; $i++) { ?>
+                    <tr>
+                        <td><input type="text" class="form-control" name="jenis_pakaian[]"></td>
+                        <td><input type="number" class="form-control" name="jumlah_pakaian[]"></td>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+
+            <div class="mb-4 mt-4">
+                <label class="form-label">Status</label>
+                <select class="form-control" name="status" required>
+                    <option value="0" <?= $t['transaksi_status'] == "0" ? "selected" : "" ?>>PROSES</option>
+                    <option value="1" <?= $t['transaksi_status'] == "1" ? "selected" : "" ?>>DICUCI</option>
+                    <option value="2" <?= $t['transaksi_status'] == "2" ? "selected" : "" ?>>SELESAI</option>
+                </select>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save2-fill"></i> Simpan Perubahan</button>
+            </div>
+        </form>
+        <?php } ?>
     </div>
 </div>
 
