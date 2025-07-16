@@ -1,100 +1,79 @@
-<?php include 'header.php';?>
-
 <?php
-//koneksi database
+session_start();
+if (!isset($_SESSION['status']) || $_SESSION['status'] !== "login") {
+    header("Location: ../index.php?pesan=belum login");
+    exit;
+}
+
+include 'header.php';
 include '../koneksi.php';
 ?>
 
-<div class="container">
-    <div class="alert alert-info text-center">
-        <h4 style="margin-bottom: 0px"><b>Selamat datang</b> di sistem informasi laundry SMKN 7 Baleendah.</h4>
+<div class="container py-4">
+    <div class="alert alert-info text-center shadow-sm">
+        <h4 class="mb-0"><strong>Selamat datang</strong> di Sistem Informasi Laundry <br>SMKN 7 Baleendah.</h4>
     </div>
 
-    <div class="panel">
-        <div class="panel-heading">
-            <h4>Dashboard</h4>
-        </div>
-        <div class="panel-body">
+    <div class="row text-center g-4 mt-4">
+        <!-- Kartu statistik -->
+        <?php
+        $pelanggan = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM pelanggan"));
+        $proses = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM transaksi WHERE transaksi_status='0'"));
+        $siap_ambil = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM transaksi WHERE transaksi_status='1'"));
+        $selesai = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM transaksi WHERE transaksi_status='2'"));
+        ?>
 
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h1>
-                                <i class="glyphicon glyphicon-user"></i>
-                                <span class="pull-right">
-                                    <?php
-                                    $pelanggan = mysqli_query($koneksi, "SELECT * FROM pelanggan");
-                                    echo mysqli_num_rows($pelanggan);
-                                    ?>
-                                </span>
-                            </h1>
-                            Jumlah pelanggan
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="panel panel-warning">
-                        <div class="panel-heading">
-                            <h1>
-                                <i class="glyphicon glyphicon-retweet"></i>
-                                <span class="pull-right">
-                                    <?php
-                                    $proses = mysqli_query($koneksi, "SELECT * FROM transaksi WHERE transaksi_status='0'");
-                                    echo mysqli_num_rows($proses);
-                                    ?>
-                                </span>
-                            </h1>
-                            Jumlah Cucian Di Proses
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h1>
-                                <i class="glyphicon glyphicon-info-sign"></i>
-                                <span class="pull-right">
-                                    <?php
-                                    $siap_ambil = mysqli_query($koneksi, "SELECT * FROM transaksi WHERE transaksi_status='1'");
-                                    echo mysqli_num_rows($siap_ambil);
-                                    ?>
-                                </span>
-                            </h1>
-                            Jumlah Cucian Siap Ambil
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="panel panel-success">
-                        <div class="panel-heading">
-                            <h1>
-                                <i class="glyphicon glyphicon-ok"></i>
-                                <span class="pull-right">
-                                    <?php
-                                    $selesai = mysqli_query($koneksi, "SELECT * FROM transaksi WHERE transaksi_status='2'");
-                                    echo mysqli_num_rows($selesai);
-                                    ?>
-                                </span>
-                            </h1>
-                            Jumlah Cucian Selesai
-                        </div>
-                    </div>
+        <div class="col-md-3">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body">
+                    <h1><i class="bi bi-people"></i></h1>
+                    <h5 class="card-title">Jumlah Pelanggan</h5>
+                    <h3 class="text-primary"><?= $pelanggan ?></h3>
                 </div>
             </div>
         </div>
 
-        <div class="panel">
-            <div class="panel-heading">
-                <h4>Riwayat Transaksi Terakhir</h4>
+        <div class="col-md-3">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body">
+                    <h1><i class="bi bi-arrow-repeat"></i></h1>
+                    <h5 class="card-title">Cucian Diproses</h5>
+                    <h3 class="text-warning"><?= $proses ?></h3>
+                </div>
             </div>
-            <div class="panel-body">
-                <table class="table table-bordered table-striped">
-                    <tr>
-                        <th width="1%">No</th>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-info shadow-sm">
+                <div class="card-body">
+                    <h1><i class="bi bi-info-circle"></i></h1>
+                    <h5 class="card-title">Siap Ambil</h5>
+                    <h3 class="text-info"><?= $siap_ambil ?></h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-success shadow-sm">
+                <div class="card-body">
+                    <h1><i class="bi bi-check-circle"></i></h1>
+                    <h5 class="card-title">Selesai</h5>
+                    <h3 class="text-success"><?= $selesai ?></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Riwayat Transaksi -->
+    <div class="card shadow mt-5">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Riwayat Transaksi Terakhir</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr class="text-center">
+                        <th>No</th>
                         <th>Invoice</th>
                         <th>Tanggal</th>
                         <th>Pelanggan</th>
@@ -103,39 +82,39 @@ include '../koneksi.php';
                         <th>Harga</th>
                         <th>Status</th>
                     </tr>
-
+                </thead>
+                <tbody>
                     <?php
                     $data = mysqli_query($koneksi, "SELECT * FROM pelanggan, transaksi WHERE transaksi_pelanggan=pelanggan_id ORDER BY transaksi_id DESC LIMIT 7");
                     $no = 1;
                     while ($d = mysqli_fetch_array($data)) {
                     ?>
                         <tr>
-                            <td><?php echo $no++; ?></td>
-                            <td>INVOICE-<?php echo $d['transaksi_id']; ?></td>
-                            <td><?php echo $d['transaksi_tgl']; ?></td>
-                            <td><?php echo $d['pelanggan_nama']; ?></td>
-                            <td><?php echo $d['transaksi_berat']; ?></td>
-                            <td><?php echo $d['transaksi_tgl_selesai']; ?></td>
-                            <td><?php echo "Rp. " . number_format($d['transaksi_harga']) . " ,-"; ?></td>
-                            <td>
+                            <td class="text-center"><?= $no++ ?></td>
+                            <td>INVOICE-<?= $d['transaksi_id'] ?></td>
+                            <td><?= $d['transaksi_tgl'] ?></td>
+                            <td><?= $d['pelanggan_nama'] ?></td>
+                            <td class="text-center"><?= $d['transaksi_berat'] ?></td>
+                            <td><?= $d['transaksi_tgl_selesai'] ?></td>
+                            <td>Rp <?= number_format($d['transaksi_harga'], 0, ',', '.') ?> ,-</td>
+                            <td class="text-center">
                                 <?php
-                                if ($d['transaksi_status'] == "0") {
-                                    echo "<div class='label label-warning'>PROSES</div>";
-                                } elseif ($d['transaksi_status'] == "1") {
-                                    echo "<div class='label label-info'>DICUCI</div>";
-                                } elseif ($d['transaksi_status'] == "2") {
-                                    echo "<div class='label label-success'>SELESAI</div>";
+                                $status = $d['transaksi_status'];
+                                if ($status == "0") {
+                                    echo "<span class='badge bg-warning text-dark'>PROSES</span>";
+                                } elseif ($status == "1") {
+                                    echo "<span class='badge bg-info text-dark'>DICUCI</span>";
+                                } elseif ($status == "2") {
+                                    echo "<span class='badge bg-success'>SELESAI</span>";
                                 }
                                 ?>
                             </td>
                         </tr>
-                    <?php
-                    }
-                    ?>
-                </table>
-            </div>
+                    <?php } ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-<?php include 'footer.php';?>
+<?php include 'footer.php'; ?>

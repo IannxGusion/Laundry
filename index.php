@@ -4,10 +4,9 @@ include 'koneksi.php';
 
 $pesan = "";
 
-// Jika form login dikirim
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = mysqli_real_escape_string($koneksi, $_POST['username']);
-    $password = md5(mysqli_real_escape_string($koneksi, $_POST['password'])); // md5 sesuai tabel
+    $password = md5(mysqli_real_escape_string($koneksi, $_POST['password']));
 
     $data = mysqli_query($koneksi, "SELECT * FROM admin WHERE username='$username' AND password='$password'");
     $cek = mysqli_num_rows($data);
@@ -22,7 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-// Pesan dari query string
 if (isset($_GET['pesan'])) {
     if ($_GET['pesan'] === "logout") {
         $pesan = "<div class='alert alert-success'>Anda telah berhasil logout.</div>";
@@ -38,34 +36,59 @@ if (isset($_GET['pesan'])) {
     <meta charset="UTF-8">
     <title>Login Admin Laundry</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="asset/css/bootstrap.min.css">
-    <script src="asset/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap 5 & Google Font -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            height: 100vh;
+        }
+        .login-container {
+            height: 100vh;
+        }
+        .login-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .card-header {
+            background: #0d6efd;
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="row justify-content-center py-5">
-            <div class="col-md-5">
-                <div class="card shadow">
-                    <div class="card-header text-center">
-                        <h5>Sistem Informasi Laundry <br> SMKN 7 Baleendah</h5>
-                    </div>
-                    <div class="card-body">
-                        <?= $pesan ?>
-                        <form method="POST" action="">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" name="username" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Log In</button>
-                        </form>
-                    </div>
+    <div class="container login-container d-flex align-items-center justify-content-center">
+        <div class="col-md-5">
+            <div class="card login-card">
+                <div class="card-header text-center py-4">
+                    <h5 class="mb-0">Sistem Informasi Laundry</h5>
+                    <small>SMKN 7 Baleendah</small>
+                </div>
+                <div class="card-body p-4">
+                    <?= $pesan ?>
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">👤 Username</label>
+                            <input type="text" name="username" class="form-control" placeholder="Masukkan username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">🔒 Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Masukkan password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-2">🔓 Masuk</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
