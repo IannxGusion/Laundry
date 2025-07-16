@@ -1,32 +1,23 @@
 <?php
-//mengatifkan session php 
 session_start();
-
-//menghubungkan dengan koneksi
 include 'koneksi.php';
 
-//menangkap data yang dikirim dari form
-$username = $_GET['username'];
-$password = md5($_GET['password']);
-//fungsi md5 di atas untuk enkripsi kedalam bentuk md5
+// Ambil input dari form POST, dan amankan
+$username = mysqli_real_escape_string($koneksi, $_POST['username']);
+$password = md5(mysqli_real_escape_string($koneksi, $_POST['password']));
 
-//menyelesaikan data admin dengan username dan password yang sesuai
-$data = mysqli_query($koneksi, "select * from admin where username='$username' and password='$password'");
-
-//menghitung jumlah data yang di temukan 
-//fungsi mysqli_num_rows() digunakan untuk mengetahui berapa banyak jumlah baris hasil pemanggilan fungsi 
-//mysqli query(). fungsi ini membutuhkan 1 buah argumen, yakni variasi resources hasil dari fungsi mysqli_query().
-//fungsi mysqli_fetch_array().fungsi ini digunakan untuk mengubah baris data yang dipilih menjadi pecahan array
+// Cek ke database tabel admin
+$data = mysqli_query($koneksi, "SELECT * FROM admin WHERE username='$username' AND password='$password'");
 $cek = mysqli_num_rows($data);
 
-//cek jika username dan password yang di input di temukan,buat session dan alihkan halaman ke halaman admin(folder admin)
-//jika tidak,alihkan kembali ke halaman depan sambil mengirim pesan gagal
-if($cek > 0) {
+// Jika cocok, buat session dan arahkan
+if ($cek > 0) {
     $_SESSION['username'] = $username;
     $_SESSION['status'] = "login";
     header("location:admin/index.php");
-}else{
-
+    exit;
+} else {
     header("location:index.php?pesan=gagal");
+    exit;
 }
-
+?>

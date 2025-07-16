@@ -1,6 +1,11 @@
-<?php 
-$koneksi = mysqli_connect ("localhost","root","","Laundry");
+<?php
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "laundry"; // ganti sesuai nama database kamu
 
-if(mysqli_connect_errno()){
-    echo "koneksi database gagal :" . mysqli_connect_error();
+$koneksi = mysqli_connect($host, $user, $pass, $db);
+if (!$koneksi) {
+    die("Koneksi database gagal: " . mysqli_connect_error());
 }
+?>
